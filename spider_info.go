@@ -9,9 +9,9 @@ type WebBody struct {
 }
 
 type ShopValue struct {
-	Name    string
-	Address string
-	Phone   string
+	Name    string `名字`
+	Address string `地址`
+	Phone   string `电话`
 }
 
 func NewWebBody(content string) WebBody {

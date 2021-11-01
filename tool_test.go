@@ -32,3 +32,10 @@ func TestEntryFront(t *testing.T) {
 	data, err := EntryFront(resource)
 	fmt.Println(data, err)
 }
+
+func TestParasStruct(t *testing.T) {
+	t.Run("println name", func(t *testing.T) {
+		data := []ShopValue{{Name: "guojia", Address: "汇盛花园", Phone: "18259891286"}, {Name: "东南花园", Address: "仓山区", Phone: "111111"}}
+		ExportDataToExcel(data, "test.xlsx", 1)
+	})
+}

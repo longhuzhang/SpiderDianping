@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -98,6 +99,8 @@ func ParesHead(str string) http.Header {
 		if len(sliceStr) < 2 {
 			continue
 		}
+		sliceStr[0] = strings.Replace(sliceStr[0], " ", "", -1)
+		sliceStr[1] = strings.Replace(sliceStr[1], " ", "", -1)
 		head.Set(sliceStr[0], sliceStr[1])
 	}
 	return head
@@ -145,6 +148,60 @@ func DownLoadFile(shopList []ShopValue, path string, page int) error {
 	}
 	// Set active sheet of the workbook.
 	// Save spreadsheet by the given path.
+	if err := f.SaveAs(path); err != nil {
+		return err
+	}
+	return nil
+}
+
+func ExportDataToExcel(data interface{}, path string, page int) error {
+	var f *excelize.File
+	var err error
+	if FileExit(path) {
+		f, err = excelize.OpenFile(path)
+		if err != nil {
+			return err
+		}
+	} else {
+		f = excelize.NewFile()
+	}
+
+	//获取字段名和备注名字
+	point := reflect.TypeOf(data).Elem()
+	var fields = make([]string, 0)
+	if page == 1 {
+		if err = f.SetCellValue("Sheet1", "A1", "序号"); err != nil {
+			return err
+		}
+	}
+
+	for i := 0; i < point.NumField(); i++ {
+		elem := point.FieldByIndex([]int{i})
+		fields = append(fields, elem.Name)
+		if page > 1 {
+			continue
+		}
+		if err = f.SetCellValue("Sheet1", string(byte('A'+i+1))+strconv.Itoa(1), elem.Tag); err != nil {
+			return err
+		}
+	}
+
+	//fmt.Println(fields)
+	//数据内容写入到excel表格中
+	value := reflect.Indirect(reflect.ValueOf(data))
+	var index int
+	for i := 0; i < value.Len(); i++ {
+		index = i + 2 + (page-1)*25
+		if err = f.SetCellValue("Sheet1", "A"+strconv.Itoa(index), strconv.Itoa(index-1)); err != nil {
+			return err
+		}
+		for k, _ := range fields {
+			if err = f.SetCellValue("Sheet1", string(byte(('A'+k+1)))+strconv.Itoa(index), value.Index(i).FieldByName(fields[k])); err != nil {
+				return err
+			}
+			//fmt.Println("index",string(byte(('A'+k+1)))+strconv.Itoa(i+2),"value:",value.Index(i).FieldByName(fields[k]))
+		}
+	}
 	if err := f.SaveAs(path); err != nil {
 		return err
 	}

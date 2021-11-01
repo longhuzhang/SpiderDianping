@@ -48,12 +48,12 @@ func SpiderData(city, page int, keyWord string) ([]ShopValue, error) {
 		entrpyt, err := EntryFront(resource)
 		if err != nil {
 			log.Println(err)
-			return nil, err
+			continue
 		}
 		data, err := DecryptFront(resource, entrpyt)
 		if err != nil {
 			log.Println(err)
-			return nil, err
+			continue
 		}
 		pares := NewWebBody(data)
 		aimData[title] = pares.SpiderInfo()
@@ -103,6 +103,9 @@ func GetData(url, head string) (string, error) {
 		return "", errors.Wrap(err, "请求出错")
 	}
 	var reader io.ReadCloser
+	if response.StatusCode != http.StatusOK {
+		return "", errors.New("Spider not ok")
+	}
 	if response.Header.Get("Content-Encoding") == "gzip" {
 		reader, err = gzip.NewReader(response.Body)
 		if err != nil {

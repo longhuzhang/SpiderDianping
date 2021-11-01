@@ -7,6 +7,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"log"
+	"os/user"
 )
 
 var cityList = []string{"上海", "北京", "重庆", "成都", "广州"}
@@ -39,18 +40,25 @@ func CreatClient() {
 	})
 	citySelect.SetSelected("上海")
 
+	//取证结果存放目录
+	name, err := user.Current()
+	if err != nil {
+		panic(err)
+	}
+
 	spiderButton := widget.NewButton("开始爬取", func() {
 		log.Println("爬取参数", keyWorkEntry.Text, CrawlPage, CrawlCity)
 		fileData, err := SpiderData(CrawlCity, CrawlPage, keyWorkEntry.Text)
 		if err != nil {
 			log.Println("爬取出错", err)
 		}
-		path := fmt.Sprintf("Desktop/%s%s.xlsx", keyWorkEntry.Text, cityNameMap[CrawlCity])
-		err = DownLoadFile(fileData, path, CrawlPage)
+		fmt.Println(fileData)
+		path := fmt.Sprintf("/Users/%s/Desktop/%s%s.xlsx", name.Name, keyWorkEntry.Text, cityNameMap[CrawlCity])
+		err = ExportDataToExcel(fileData, path, CrawlPage)
 		if err != nil {
 			log.Println("数据存储失败", err)
 		}
-		log.Println("数据爬取成功。")
+		log.Println("数据保存成功。")
 	})
 
 	pauseButton := widget.NewButton("暂停", func() {
@@ -66,6 +74,7 @@ func CreatClient() {
 
 	cookieButton := widget.NewButton("更新请求头", func() {
 		head = cookieEntry.Text
+		log.Println("更新请求头成功")
 	})
 
 	//输入输出窗口和按钮布局

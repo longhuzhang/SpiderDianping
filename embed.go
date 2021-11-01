@@ -15,6 +15,10 @@ import "embed"
 //go:embed tmp/f7fec93e.json
 //go:embed tmp/fd3e5bf5.json
 //go:embed tmp/febad456.json
+//go:embed tmp/0e5c4c69.json
+//go:embed tmp/61478e36.json
+//go:embed tmp/c75d3538.json
+//go:embed tmp/ec1ec5f6.json
 var jsonFile embed.FS
 
 var FileStore = map[string]bool{
@@ -31,4 +35,8 @@ var FileStore = map[string]bool{
 	"tmp/f7fec93e.json": true,
 	"tmp/fd3e5bf5.json": true,
 	"tmp/febad456.json": true,
+	"tmp/0e5c4c69.json": true,
+	"tmp/61478e36.json": true,
+	"tmp/c75d3538.json": true,
+	"tmp/ec1ec5f6.json": true,
 }
